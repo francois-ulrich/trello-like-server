@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\BoardController;
 use App\Http\Controllers\UserProfileController;
+use App\Http\Controllers\ColumnController;
 use App\Http\Middleware\JwtMiddleware;
 
 Route::middleware(JwtMiddleware::class)->group(function ($router) {
@@ -14,6 +15,7 @@ Route::middleware(JwtMiddleware::class)->group(function ($router) {
     });
 
     Route::apiResource('boards', BoardController::class);
+    Route::apiResource('columns', ColumnController::class);
 
     Route::get('hello', function () { return 'Hello World !!'; });
 
