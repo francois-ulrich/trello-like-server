@@ -2,21 +2,14 @@
 
 namespace App\Policies;
 
+use App\Models\Board;
 use App\Models\Column;
 use App\Models\User;
 
 class ColumnPolicy
 {
-    private function columnIsInUserOwnedBoard(User $user, Column $column): bool {
-        return  $column->board->user_id === $user->id;
-    }
-
-    /**
-     * Determine whether the user can view any models.
-     */
-    public function viewAny(User $user, Column $column): bool
-    {
-        return false;
+    private function columnIsOwnedByUser(User $user, Column $column): bool {
+        return $column->board->user_id === $user->id;
     }
 
     /**
@@ -24,15 +17,7 @@ class ColumnPolicy
      */
     public function view(User $user, Column $column): bool
     {
-        return $this->columnIsInUserOwnedBoard($user, $column);
-    }
-
-    /**
-     * Determine whether the user can create models.
-     */
-    public function create(User $user): bool
-    {
-        return true;
+        return $this->columnIsOwnedByUser($user, $column);
     }
 
     /**
@@ -40,7 +25,7 @@ class ColumnPolicy
      */
     public function update(User $user, Column $column): bool
     {
-        return $this->columnIsInUserOwnedBoard($user, $column);
+        return $this->columnIsOwnedByUser($user, $column);
     }
 
     /**
@@ -48,7 +33,7 @@ class ColumnPolicy
      */
     public function delete(User $user, Column $column): bool
     {
-        return $this->columnIsInUserOwnedBoard($user, $column);
+        return $this->columnIsOwnedByUser($user, $column);
     }
 
     /**

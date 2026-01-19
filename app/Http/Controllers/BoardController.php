@@ -85,6 +85,6 @@ class BoardController extends Controller
 
         $board->delete();
 
-        return response()->json(['message' => 'Resource deleted successfully'], 200);
+        return response()->json(['message' => 'Resource deleted successfully'], 200); //TODO: standardiser le format des response
     }
 }

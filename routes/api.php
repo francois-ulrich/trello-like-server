@@ -14,8 +14,11 @@ Route::middleware(JwtMiddleware::class)->group(function ($router) {
         Route::post('logout', [AuthController::class, 'logout']);
     });
 
+    // Columns
+    Route::apiResource('boards.columns', ColumnController::class)->scoped();
+    // Boards
     Route::apiResource('boards', BoardController::class);
-    Route::apiResource('columns', ColumnController::class);
+
 
     Route::get('hello', function () { return 'Hello World !!'; });
 
