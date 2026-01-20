@@ -5,6 +5,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\BoardController;
 use App\Http\Controllers\UserProfileController;
 use App\Http\Controllers\ColumnController;
+use App\Http\Controllers\CardController;
 use App\Http\Middleware\JwtMiddleware;
 
 Route::middleware(JwtMiddleware::class)->group(function ($router) {
@@ -14,8 +15,15 @@ Route::middleware(JwtMiddleware::class)->group(function ($router) {
         Route::post('logout', [AuthController::class, 'logout']);
     });
 
+    // Cards
+    Route::apiResource('boards.columns.cards', CardController::class)->scoped([
+        'column' => 'id',
+        'card' => 'id',
+    ]);
+
     // Columns
     Route::apiResource('boards.columns', ColumnController::class)->scoped();
+
     // Boards
     Route::apiResource('boards', BoardController::class);
 
