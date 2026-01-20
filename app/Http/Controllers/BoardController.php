@@ -17,6 +17,15 @@ class BoardController extends Controller
     }
 
     /**
+     * Display the specified resource.
+     */
+    public function show(Board $board)
+    {
+        $this->authorize("view", $board);
+        return response()->json($board, 200);
+    }
+
+    /**
      * Store a newly created resource in storage.
      */
     public function store(Request $request)
@@ -34,28 +43,11 @@ class BoardController extends Controller
     }
 
     /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
-    {
-        $board = Board::where('user_id', auth()->user()->id)->findOrFail($id);
-        return response()->json($board, 200);
-    }
-
-    /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(Board $board, Request $request)
     {
-        $board = Board::where('user_id', auth()->user()->id)->findOrFail($id);
-
-        if(!$board)
-            return response()->json([
-                'error' => [
-                    'code' => 404,
-                    'message' => 'Resource not found',
-                ]
-            ], 404);
+        $this->authorize('update', $board);
 
         $request->validate([
             'title' => 'string|max:255',
@@ -71,20 +63,9 @@ class BoardController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy(Board $board)
     {
-        $board = Board::where('user_id', auth()->user()->id)->find($id);
-
-        if(!$board)
-            return response()->json([
-                'error' => [
-                    'code' => 404,
-                    'message' => 'Resource not found',
-                ]
-            ], 404);
-
         $board->delete();
-
         return response()->json(['message' => 'Resource deleted successfully'], 200); //TODO: standardiser le format des response
     }
 }
