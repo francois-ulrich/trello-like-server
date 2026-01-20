@@ -54,16 +54,38 @@ class CardController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Card $card)
+    public function update(Board $board, Column $column, Card $card, Request $request)
     {
-        //
+        $this->authorize('update', $card);
+
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'description' => 'nullable|string|max:1000',
+        ]);
+
+        $card->update(['name' => $request->get('name')]);
+        $card->update(['description' => $request->get('description')]);
+
+        return response()->json($card, 200);
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Card $card)
+    public function destroy(Board $board, Column $column, Card $card)
     {
-        //
+        if(!$card)
+            return response()->json([
+                'error' => [
+                    'code' => 404,
+                    'message' => 'Resource not found',
+                ]
+            ], 404);
+
+        $this->authorize('delete', $card);
+
+        $card->delete();
+
+        return response()->json(['message' => 'Resource deleted successfully'], 200);
     }
 }
