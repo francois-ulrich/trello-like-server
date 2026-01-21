@@ -40,11 +40,11 @@ class CardController extends Controller
             'description' => 'nullable|string|max:1000',
         ]);
 
-        $position = $column->cards->count();
+        $lastPosition = $column->cards->max('position') ?? -1;
 
         $card = Card::create([
             "column_id"=>$column->id,
-            'position' => $position,
+            'position' => $lastPosition + 1,
             ...$validated,
         ]);
 
