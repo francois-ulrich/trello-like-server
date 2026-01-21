@@ -7,8 +7,9 @@ use Illuminate\Database\Eloquent\Model;
 class Column extends Model
 {
     protected $fillable = [
-        'name',
         'board_id',
+        'name',
+        'position',
     ];
 
     public function board()

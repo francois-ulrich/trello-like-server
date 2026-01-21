@@ -8,16 +8,12 @@ use App\Models\User;
 
 class ColumnPolicy
 {
-    private function columnIsOwnedByUser(User $user, Column $column): bool {
-        return $column->board->user_id === $user->id;
-    }
-
     /**
      * Determine whether the user can view the model.
      */
     public function view(User $user, Column $column): bool
     {
-        return $this->columnIsOwnedByUser($user, $column);
+        return $column->board->user_id === $user->id;
     }
 
     /**
@@ -25,7 +21,7 @@ class ColumnPolicy
      */
     public function update(User $user, Column $column): bool
     {
-        return $this->columnIsOwnedByUser($user, $column);
+        return $column->board->user_id === $user->id;
     }
 
     /**
@@ -33,7 +29,7 @@ class ColumnPolicy
      */
     public function delete(User $user, Column $column): bool
     {
-        return $this->columnIsOwnedByUser($user, $column);
+        return $column->board->user_id === $user->id;
     }
 
     /**

@@ -31,7 +31,7 @@ class BoardController extends Controller
     public function store(Request $request)
     {
         $data = $request->validate([
-            'title' => 'required|string|max:255',
+            'name' => 'required|string|max:255',
         ]);
 
         $board = Board::create([
@@ -50,10 +50,10 @@ class BoardController extends Controller
         $this->authorize('update', $board);
 
         $request->validate([
-            'title' => 'string|max:255',
+            'name' => 'string|max:255',
         ]);
 
-        $board->title = $request->get('title');
+        $board->name = $request->get('name');
 
         $board->save();
 
