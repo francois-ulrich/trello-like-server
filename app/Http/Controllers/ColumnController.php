@@ -34,12 +34,15 @@ class ColumnController extends Controller
     {
         $this->authorize('view', $board);
 
+        $lastPosition = $board->columns->max('position') ?? -1;
+
         $data = $request->validate([
             'name' => 'required|string|max:255',
         ]);
 
         $column = Column::create([
             "board_id"=>$board->id,
+            'position' => $lastPosition + 1,
             ...$data,
         ]);
 
@@ -52,8 +55,6 @@ class ColumnController extends Controller
     public function update(Board $board, Column $column, Request $request)
     {
         $this->authorize('update', $column);
-
-        // $column = $board->columns()->findOrFail($columnId);
 
         $request->validate([
             'name' => 'required|string|max:255',

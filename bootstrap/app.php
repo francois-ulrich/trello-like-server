@@ -36,7 +36,7 @@ return Application::configure(basePath: dirname(__DIR__))
                         'exception' => get_class($e),
                         'file' => $e->getFile(),
                         'line' => $e->getLine(),
-                        'trace' => collect($e->getTrace())->take(10), // limite le bruit
+                        'trace' => collect($e->getTrace())->take(10),
                     ];
                 }
 
