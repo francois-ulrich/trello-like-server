@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Board;
 use App\Models\Column;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class ColumnController extends Controller
 {
@@ -63,6 +64,42 @@ class ColumnController extends Controller
         $column->update(['name' => $request->get('name')]);
 
         return response()->json($column, 200);
+    }
+
+    public function move(Board $board, Column $column, Request $request)
+    {
+        $this->authorize('update', $column);
+
+        $data = $request->validate([
+            'targetPosition' => 'required|integer|min:0',
+        ]);
+
+        $targetPosition = $data['targetPosition'];
+
+        if ($targetPosition === $column->position) {
+            return response()->json($column, 200);
+        }
+
+        $maxPosition = $board->columns()->max('position');
+
+        if ($targetPosition > $maxPosition) {
+            return response()->json([
+                'error' => [
+                    'code' => 422,
+                    'message' => 'Invalid target position',
+                ]
+            ], 422);
+        }
+
+        DB::transaction(function () use ($board, $column, $targetPosition) {
+            $previousPosition = $column->position;
+            $columnToDisplace = $board->columns->where("position", $targetPosition)->firstOrFail();
+
+            $column->update(['position' => $targetPosition]);
+            $columnToDisplace->update(['position' => $previousPosition]);
+        });
+
+        return response()->json( $board->columns()->orderBy('position')->get(), 200 );
     }
 
     /**

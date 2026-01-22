@@ -16,13 +16,11 @@ Route::middleware(JwtMiddleware::class)->group(function ($router) {
     });
 
     // Cards
-    Route::apiResource('boards.columns.cards', CardController::class)->scoped([
-        'column' => 'id',
-        'card' => 'id',
-    ]);
+    Route::apiResource('boards.columns.cards', CardController::class)->scoped();
 
     // Columns
     Route::apiResource('boards.columns', ColumnController::class)->scoped();
+    Route::patch('boards/{board}/columns/{column}/move', [ColumnController::class, 'move'] )->scopeBindings();
 
     // Boards
     Route::apiResource('boards', BoardController::class);
