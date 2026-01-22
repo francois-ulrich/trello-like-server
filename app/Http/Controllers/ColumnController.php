@@ -15,7 +15,7 @@ class ColumnController extends Controller
     public function index(Board $board)
     {
         $this->authorize('view', $board);
-        $columns = $board->columns;
+        $columns = $board->columns()->orderBy('position')->get();
         return response()->json($columns, 200);
     }
 

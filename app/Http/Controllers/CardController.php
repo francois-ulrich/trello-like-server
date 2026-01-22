@@ -16,7 +16,7 @@ class CardController extends Controller
     public function index(Board $board, Column $column)
     {
         $this->authorize('view', $column);
-        $cards = $column->cards;
+        $cards = $column->cards()->orderBy('position')->get();
         return response()->json($cards, 200);
     }
 
