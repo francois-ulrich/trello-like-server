@@ -77,7 +77,7 @@ class ColumnController extends Controller
         $targetPosition = $data['targetPosition'];
 
         if ($targetPosition === $column->position) {
-            return response()->json($column, 200);
+            return response()->json( $board->columns()->orderBy('position')->get(), 200 );
         }
 
         $maxPosition = $board->columns()->max('position');

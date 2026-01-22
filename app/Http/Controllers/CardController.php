@@ -6,6 +6,7 @@ use App\Models\Board;
 use App\Models\Card;
 use App\Models\Column;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class CardController extends Controller
 {
@@ -67,6 +68,42 @@ class CardController extends Controller
         $card->update(['description' => $request->get('description')]);
 
         return response()->json($card, 200);
+    }
+
+    public function move(Board $board, Column $column, Card $card, Request $request)
+    {
+        $this->authorize('update', $card);
+
+        $data = $request->validate([
+            'targetPosition' => 'required|integer|min:0',
+        ]);
+
+        $targetPosition = $data['targetPosition'];
+
+        if ($targetPosition === $card->position) {
+            return response()->json( $column->cards()->orderBy('position')->get(), 200 );
+        }
+
+        $maxPosition = $column->cards()->max('position');
+
+        if ($targetPosition > $maxPosition) {
+            return response()->json([
+                'error' => [
+                    'code' => 422,
+                    'message' => 'Invalid target position',
+                ]
+            ], 422);
+        }
+
+        DB::transaction(function () use ($column, $card, $targetPosition) {
+            $previousPosition = $card->position;
+            $cardToDisplace = $column->cards->where("position", $targetPosition)->firstOrFail();
+
+            $card->update(['position' => $targetPosition]);
+            $cardToDisplace->update(['position' => $previousPosition]);
+        });
+
+        return response()->json( $column->cards()->orderBy('position')->get(), 200 );
     }
 
     /**

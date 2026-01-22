@@ -17,6 +17,7 @@ Route::middleware(JwtMiddleware::class)->group(function ($router) {
 
     // Cards
     Route::apiResource('boards.columns.cards', CardController::class)->scoped();
+    Route::patch('boards/{board}/columns/{column}/cards/{card}/move', [CardController::class, 'move'] )->scopeBindings();
 
     // Columns
     Route::apiResource('boards.columns', ColumnController::class)->scoped();
