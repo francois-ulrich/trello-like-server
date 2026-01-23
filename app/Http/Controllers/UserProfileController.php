@@ -25,7 +25,6 @@ class UserProfileController extends Controller
         $validator = Validator::make($request->all(), [
             'profile_pic' => 'string|max:255|nullable',
             'bio' => 'required|string|max:160|nullable',
-            'gender' => [Rule::enum(Gender::class), 'nullable'],
         ]);
 
         $user = auth()->user();
@@ -34,7 +33,6 @@ class UserProfileController extends Controller
 
         $profile->profile_pic = $request->get('profile_pic');
         $profile->bio = $request->get('bio');
-        $profile->gender = $request->get('gender');
 
         $profile->save();
 

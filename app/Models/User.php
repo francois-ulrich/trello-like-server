@@ -23,6 +23,7 @@ class User extends Authenticatable implements JWTSubject
         'name',
         'email',
         'password',
+        'role_id',
     ];
 
     /**
@@ -71,5 +72,14 @@ class User extends Authenticatable implements JWTSubject
     public function profile(): HasOne
     {
         return $this->hasOne(UserProfile::class);
+    }
+    public function role()
+    {
+        return $this->belongsTo(Role::class);
+    }
+
+    public function isAdmin(): bool
+    {
+        return $this->role->slug === 'admin';
     }
 }

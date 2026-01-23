@@ -15,8 +15,7 @@ class UserProfile extends Model
     protected $fillable = [
         'user_id',
         'profile_pic',
-        'bio',
-        'gender'
+        'color'
     ];
 
     // Définissez la relation avec l'utilisateur

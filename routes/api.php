@@ -7,12 +7,19 @@ use App\Http\Controllers\UserProfileController;
 use App\Http\Controllers\ColumnController;
 use App\Http\Controllers\CardController;
 use App\Http\Middleware\JwtMiddleware;
+use App\Http\Middleware\AdminMiddleware;
 
-Route::middleware(JwtMiddleware::class)->group(function ($router) {
-    Route::prefix('auth')->group(function ($router) {
+Route::middleware(JwtMiddleware::class)->group(function () {
+    // Authentication
+    Route::prefix('auth')->group(function () {
         Route::post('register', [AuthController::class, 'register'])->withoutMiddleware([JwtMiddleware::class]);
         Route::post('login', [AuthController::class, 'login'])->withoutMiddleware([JwtMiddleware::class]);
         Route::post('logout', [AuthController::class, 'logout']);
+    });
+
+    // Admin
+    Route::middleware([AdminMiddleware::class])->prefix('admin')->group(function () {
+        Route::get('hello', function () { return 'Hello World !! in admin mode'; });
     });
 
     // Cards
@@ -25,9 +32,6 @@ Route::middleware(JwtMiddleware::class)->group(function ($router) {
 
     // Boards
     Route::apiResource('boards', BoardController::class);
-
-
-    Route::get('hello', function () { return 'Hello World !!'; });
 
     // User
     Route::get('user', [AuthController::class, 'getUser']);
