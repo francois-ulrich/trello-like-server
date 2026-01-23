@@ -8,6 +8,7 @@ use App\Http\Controllers\ColumnController;
 use App\Http\Controllers\CardController;
 use App\Http\Middleware\JwtMiddleware;
 use App\Http\Middleware\AdminMiddleware;
+use App\Http\Controllers\Admin\UserController;
 
 Route::middleware(JwtMiddleware::class)->group(function () {
     // Authentication
@@ -19,7 +20,7 @@ Route::middleware(JwtMiddleware::class)->group(function () {
 
     // Admin
     Route::middleware([AdminMiddleware::class])->prefix('admin')->group(function () {
-        Route::get('hello', function () { return 'Hello World !! in admin mode'; });
+        Route::apiResource('users', UserController::class)->only(['index', 'show']); //TODO: add ->only([]) to other route declarations
     });
 
     // Cards
