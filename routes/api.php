@@ -19,6 +19,9 @@ Route::middleware(JwtMiddleware::class)->group(function () {
         Route::post('logout', [AuthController::class, 'logout']);
     });
 
+    // User
+    Route::get('user', [AuthController::class, 'getUser']);
+
     Route::middleware([EnsureUserIsNotBanned::class])->group(function () {
         // Admin
         Route::middleware([AdminMiddleware::class])->prefix('admin')->group(function () {
@@ -37,9 +40,6 @@ Route::middleware(JwtMiddleware::class)->group(function () {
 
         // Boards
         Route::apiResource('boards', BoardController::class);
-
-        // User
-        Route::get('user', [AuthController::class, 'getUser']);
 
         // User profile
         Route::get('user/profile', [UserProfileController::class, 'get']);
