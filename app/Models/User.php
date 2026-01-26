@@ -82,4 +82,9 @@ class User extends Authenticatable implements JWTSubject
     {
         return $this->role->slug === 'admin';
     }
+
+    public function isBanned(): bool
+    {
+        return !is_null($this->banned_at);
+    }
 }

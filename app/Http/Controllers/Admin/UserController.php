@@ -29,6 +29,10 @@ class UserController extends Controller
     public function ban(string $user_id)
     {
         $user = User::findOrFail($user_id);
+
+        if($user->isAdmin())
+            return response()->json($user, 200);
+
         $user->update([ 'banned_at' => now(), ]);
         return response()->json($user, 200);
     }
@@ -36,6 +40,10 @@ class UserController extends Controller
     public function unban(string $user_id)
     {
         $user = User::findOrFail($user_id);
+
+        if($user->isAdmin())
+            return response()->json($user, 200);
+
         $user->update([ 'banned_at' => null, ]);
         return response()->json($user, 200);
     }
