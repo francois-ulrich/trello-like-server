@@ -27,12 +27,13 @@ return Application::configure(basePath: dirname(__DIR__))
                 $response = [
                     'error' => [
                         'code' => $e->getStatusCode(),
-                        'message' => $e->getMessage() ?: \Symfony\Component\HttpFoundation\Response::$statusTexts[$e->getStatusCode()],
+                        'message' => "An error has occured"
                     ]
                 ];
 
                 if (!app()->isProduction()) {
                     $response['error']['debug'] = [
+                        'message' => $e->getMessage() ?: \Symfony\Component\HttpFoundation\Response::$statusTexts[$e->getStatusCode()],
                         'exception' => get_class($e),
                         'file' => $e->getFile(),
                         'line' => $e->getLine(),

@@ -21,6 +21,8 @@ Route::middleware(JwtMiddleware::class)->group(function () {
     // Admin
     Route::middleware([AdminMiddleware::class])->prefix('admin')->group(function () {
         Route::apiResource('users', UserController::class)->only(['index', 'show']); //TODO: add ->only([]) to other route declarations
+        Route::patch('users/{user_id}/ban', [UserController::class, 'ban'] );
+        Route::patch('users/{user_id}/unban', [UserController::class, 'unban'] );
     });
 
     // Cards

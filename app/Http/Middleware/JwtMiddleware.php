@@ -12,10 +12,24 @@ class JwtMiddleware
     {
         try {
             if (!JWTAuth::parseToken()->authenticate()) {
-                return response()->json(['error' => 'User not found'], 404);
+                $response = [
+                    'error' => [
+                        'code' => 404,
+                        'message' => "User not found"
+                    ]
+                ];
+
+                return response()->json($response, 404);
             }
         } catch (JWTException $e) {
-            return response()->json(['error' => 'Invalid token'], 400);
+            $response = [
+                'error' => [
+                    'code' => 400,
+                    'message' => "Invalid token"
+                ]
+            ];
+
+            return response()->json($response, 400);
         }
 
         return $next($request);
