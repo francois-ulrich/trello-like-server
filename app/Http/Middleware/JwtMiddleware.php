@@ -5,6 +5,7 @@ namespace App\Http\Middleware;
 use Closure;
 use Tymon\JWTAuth\Facades\JWTAuth;
 use Tymon\JWTAuth\Exceptions\JWTException;
+use App\Http\ApiResponse;
 
 class JwtMiddleware
 {
@@ -12,24 +13,10 @@ class JwtMiddleware
     {
         try {
             if (!JWTAuth::parseToken()->authenticate()) {
-                $response = [
-                    'error' => [
-                        'code' => 404,
-                        'message' => "User not found"
-                    ]
-                ];
-
-                return response()->json($response, 404);
+                return ApiResponse::error('User not found', 400);
             }
         } catch (JWTException $e) {
-            $response = [
-                'error' => [
-                    'code' => 400,
-                    'message' => "Invalid token"
-                ]
-            ];
-
-            return response()->json($response, 400);
+            return ApiResponse::error('Invalid token', 400, $e);
         }
 
         return $next($request);

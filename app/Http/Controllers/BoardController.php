@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Board;
+use App\Http\ApiResponse;
 use Illuminate\Http\Request;
 
 class BoardController extends Controller
@@ -13,7 +14,7 @@ class BoardController extends Controller
     public function index()
     {
         $boards = Board::where('user_id', auth()->user()->id)->get();
-        return response()->json($boards, 200);
+        return ApiResponse::success($boards);
     }
 
     /**
@@ -39,7 +40,7 @@ class BoardController extends Controller
             'user_id' => $request->user()->id,
         ]);
 
-        return response()->json($board, 201);
+        return ApiResponse::created($board);
     }
 
     /**

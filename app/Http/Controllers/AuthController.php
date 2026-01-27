@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use App\Models\Role;
 use App\Models\UserProfile;
+use App\Http\ApiResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
@@ -29,6 +31,7 @@ class AuthController extends Controller
             'name' => $request->get('name'),
             'email' => $request->get('email'),
             'password' => Hash::make($request->get('password')),
+            'role_id' => Role::where('slug', 'user')->first()->id,
         ]);
 
         $user->profile()->save(new UserProfile());
@@ -56,15 +59,13 @@ class AuthController extends Controller
         $credentials = $request->only('email', 'password');
 
         try {
-            if (! $token = JWTAuth::attempt($credentials)) {
-                return response()->json(['error' => 'Invalid credentials'], 401);
+            $token = JWTAuth::attempt($credentials);
+            if (!$token ) {
+                return ApiResponse::error('Invalid credentials', 401);
             }
 
             // Get the authenticated user.
             $user = auth()->user();
-
-            // (optional) Attach the role to the token.
-            $token = JWTAuth::claims(['role' => $user->role])->fromUser($user);
 
             $cookie = cookie(
                 'token',      // Nom du cookie
@@ -78,9 +79,9 @@ class AuthController extends Controller
                 'None'          // Politique SameSite
             );
 
-            return response()->json(compact('user'))->cookie($cookie);
+            return ApiResponse::success(compact('user'))->cookie($cookie);
         } catch (JWTException $e) {
-            return response()->json(['error' => 'Could not create token'], 500);
+            return ApiResponse::error('Could not create token', 500, $e);
         }
     }
 
@@ -89,10 +90,10 @@ class AuthController extends Controller
     {
         try {
             if (! $user = JWTAuth::parseToken()->authenticate()) {
-                return response()->json(['error' => 'User not found'], 404);
+                return ApiResponse::error('User not found', 404);
             }
         } catch (JWTException $e) {
-            return response()->json(['error' => 'Invalid token'], 400);
+            return ApiResponse::error('Invalid token', 400, $e);
         }
 
         return response()->json(compact('user'));

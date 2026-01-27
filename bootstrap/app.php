@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
 use Illuminate\Http\Request;
-
+use App\Http\ApiResponse;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -18,7 +18,6 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware) {
     })
     ->withExceptions(function (Exceptions $exceptions) {
-
         $exceptions->render(function (
             HttpExceptionInterface $e,
             Request $request
@@ -27,7 +26,7 @@ return Application::configure(basePath: dirname(__DIR__))
                 $response = [
                     'error' => [
                         'code' => $e->getStatusCode(),
-                        'message' => "An error has occured"
+                        'message' => $e->getMessage() ?: "An error has occured"
                     ]
                 ];
 
@@ -42,6 +41,12 @@ return Application::configure(basePath: dirname(__DIR__))
                 }
 
                 return response()->json($response, $e->getStatusCode());
+            }
+        });
+
+        $exceptions->render(function (Throwable $e, $request) {
+            if ($request->expectsJson()) {
+                return ApiResponse::error("A server error has occured", 500, $e );
             }
         });
     })
