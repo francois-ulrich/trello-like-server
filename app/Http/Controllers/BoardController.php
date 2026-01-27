@@ -23,7 +23,7 @@ class BoardController extends Controller
     public function show(Board $board)
     {
         $this->authorize("view", $board);
-        return response()->json($board, 200);
+        return ApiResponse::success($board);
     }
 
     /**
@@ -58,7 +58,7 @@ class BoardController extends Controller
 
         $board->save();
 
-        return response()->json($board, 200);
+        return ApiResponse::updated($board);
     }
 
     /**
@@ -66,7 +66,8 @@ class BoardController extends Controller
      */
     public function destroy(Board $board)
     {
+        $this->authorize('delete', $board);
         $board->delete();
-        return response()->json(['message' => 'Resource deleted successfully'], 200); //TODO: standardiser le format des response
+        return ApiResponse::deleted($board);
     }
 }

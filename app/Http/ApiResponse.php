@@ -59,7 +59,7 @@ class ApiResponse
 
     public static function deleted(mixed $data, ?string $message = null): JsonResponse
     {
-        return self::created($data, $message ?? 'Resource deleted.', 200);
+        return self::success($data, $message ?? 'Resource deleted.', 200);
     }
 
     // /**
