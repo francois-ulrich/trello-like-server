@@ -100,7 +100,7 @@ class ColumnController extends Controller
             $columnToDisplace->update(['position' => $previousPosition]);
         });
 
-        return ApiResponse::updated($board->columns()->orderBy('position')->get()); //TODO: return $column instead ?
+        return ApiResponse::updated($column);
     }
 
     /**
@@ -117,6 +117,17 @@ class ColumnController extends Controller
             ], 404);
 
         $this->authorize('delete', $column);
+
+        DB::transaction(function () use ($column) {
+            $position = $column->position;
+            $boardId  = $column->board_id;
+
+            $column->delete();
+
+            Column::where('board_id', $boardId)
+                ->where('position', '>', $position)
+                ->decrement('position');
+        });
 
         $column->delete();
 

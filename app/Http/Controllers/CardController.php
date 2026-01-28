@@ -121,7 +121,16 @@ class CardController extends Controller
 
         $this->authorize('delete', $card);
 
-        $card->delete();
+        DB::transaction(function () use ($card) {
+            $position = $card->position;
+            $columnId  = $card->column_id;
+
+            $card->delete();
+
+            Card::where('column_id', $columnId)
+                ->where('position', '>', $position)
+                ->decrement('position');
+        });
 
         return ApiResponse::deleted($card);
     }
