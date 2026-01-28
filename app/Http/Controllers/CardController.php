@@ -7,6 +7,7 @@ use App\Models\Card;
 use App\Models\Column;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use App\Http\ApiResponse;
 
 class CardController extends Controller
 {
@@ -17,7 +18,7 @@ class CardController extends Controller
     {
         $this->authorize('view', $column);
         $cards = $column->cards()->orderBy('position')->get();
-        return response()->json($cards, 200);
+        return ApiResponse::success($cards);
     }
 
     /**
@@ -26,7 +27,7 @@ class CardController extends Controller
     public function show(Board $board, Column $column, Card $card)
     {
         $this->authorize('view', $card);
-        return response()->json($card, 200);
+        return ApiResponse::success($card);
     }
 
     /**
@@ -49,7 +50,7 @@ class CardController extends Controller
             ...$validated,
         ]);
 
-        return response()->json($card, 201);
+        return ApiResponse::created($card);
     }
 
     /**
@@ -59,15 +60,14 @@ class CardController extends Controller
     {
         $this->authorize('update', $card);
 
-        $request->validate([
-            'name' => 'required|string|max:255',
+        $validated = $request->validate([
+            'name' => 'string|max:255',
             'description' => 'nullable|string|max:1000',
         ]);
 
-        $card->update(['name' => $request->get('name')]);
-        $card->update(['description' => $request->get('description')]);
+        $card->update($validated);
 
-        return response()->json($card, 200);
+        return ApiResponse::updated($card);
     }
 
     public function move(Board $board, Column $column, Card $card, Request $request)
@@ -103,7 +103,7 @@ class CardController extends Controller
             $cardToDisplace->update(['position' => $previousPosition]);
         });
 
-        return response()->json( $column->cards()->orderBy('position')->get(), 200 );
+        return ApiResponse::updated($card);
     }
 
     /**
@@ -123,6 +123,6 @@ class CardController extends Controller
 
         $card->delete();
 
-        return response()->json(['message' => 'Resource deleted successfully'], 200);
+        return ApiResponse::deleted($card);
     }
 }

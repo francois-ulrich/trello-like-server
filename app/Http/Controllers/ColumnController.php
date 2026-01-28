@@ -100,7 +100,7 @@ class ColumnController extends Controller
             $columnToDisplace->update(['position' => $previousPosition]);
         });
 
-        return ApiResponse::success($board->columns()->orderBy('position')->get());
+        return ApiResponse::updated($board->columns()->orderBy('position')->get()); //TODO: return $column instead ?
     }
 
     /**
