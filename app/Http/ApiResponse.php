@@ -23,14 +23,17 @@ class ApiResponse
     }
 
     public static function error(
-        string $message,
-        int $code = 400,
+        ?string $message = null,
+        ?int $code = 400,
         ?Throwable $e = null
     ): JsonResponse {
+
         $response = [
             'error' => array_merge(
-                ['code' => $code, 'message' => $message],
-                $details ?? []
+                [
+                    'code' => $code,
+                    'message' => $message
+                ]
             ),
         ];
 
@@ -43,7 +46,6 @@ class ApiResponse
                 'trace' => collect($e->getTrace())->take(10),
             ];
         }
-
         return response()->json($response, $code);
     }
 
@@ -54,23 +56,11 @@ class ApiResponse
 
     public static function updated(mixed $data, ?string $message = null): JsonResponse
     {
-        return self::created($data, $message ?? 'Resource updated.', 200);
+        return self::success($data, $message ?? 'Resource updated.', 200);
     }
 
     public static function deleted(mixed $data, ?string $message = null): JsonResponse
     {
         return self::success($data, $message ?? 'Resource deleted.', 200);
     }
-
-    // /**
-    //  * Validation error (422)
-    //  */
-    // public static function validationError(array $errors, ?string $message = null): JsonResponse
-    // {
-    //     return self::error(
-    //         $message ?? 'Validation failed',
-    //         422,
-    //         ['fields' => $errors]
-    //     );
-    // }
 }

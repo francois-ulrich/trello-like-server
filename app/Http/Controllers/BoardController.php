@@ -51,7 +51,7 @@ class BoardController extends Controller
         $this->authorize('update', $board);
 
         $request->validate([
-            'name' => 'string|max:255',
+            'name' => 'required|string|max:255',
         ]);
 
         $board->name = $request->get('name');

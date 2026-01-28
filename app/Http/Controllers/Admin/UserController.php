@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use Illuminate\Http\Request;
 use App\Models\User;
 use App\Http\Controllers\Controller;
+use App\Http\ApiResponse;
 
 class UserController extends Controller
 {
@@ -14,7 +15,7 @@ class UserController extends Controller
     public function index()
     {
         $users = User::with('profile', 'role')->get();
-        return response()->json($users, 200);
+        return ApiResponse::success($users);
     }
 
     /**
