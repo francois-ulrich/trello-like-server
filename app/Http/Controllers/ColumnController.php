@@ -6,6 +6,7 @@ use App\Models\Board;
 use App\Models\Column;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use App\Http\ApiResponse;
 
 class ColumnController extends Controller
 {
@@ -16,7 +17,7 @@ class ColumnController extends Controller
     {
         $this->authorize('view', $board);
         $columns = $board->columns()->orderBy('position')->get();
-        return response()->json($columns, 200);
+        return ApiResponse::success($columns);
     }
 
     /**
@@ -25,7 +26,7 @@ class ColumnController extends Controller
     public function show(Board $board, Column $column)
     {
         $this->authorize('view', $column);
-        return response()->json($column, 200);
+        return ApiResponse::success($column);
     }
 
     /**
@@ -47,7 +48,7 @@ class ColumnController extends Controller
             ...$data,
         ]);
 
-        return response()->json($column, 201);
+        return ApiResponse::created($column);
     }
 
     /**
@@ -63,7 +64,7 @@ class ColumnController extends Controller
 
         $column->update(['name' => $request->get('name')]);
 
-        return response()->json($column, 200);
+        return ApiResponse::updated($column);
     }
 
     public function move(Board $board, Column $column, Request $request)
@@ -99,7 +100,7 @@ class ColumnController extends Controller
             $columnToDisplace->update(['position' => $previousPosition]);
         });
 
-        return response()->json( $board->columns()->orderBy('position')->get(), 200 );
+        return ApiResponse::success($board->columns()->orderBy('position')->get());
     }
 
     /**
@@ -119,6 +120,6 @@ class ColumnController extends Controller
 
         $column->delete();
 
-        return response()->json(['message' => 'Resource deleted successfully'], 200);
+        return ApiResponse::deleted($column);
     }
 }
