@@ -78,18 +78,13 @@ class ColumnController extends Controller
         $targetPosition = $data['targetPosition'];
 
         if ($targetPosition === $column->position) {
-            return response()->json( $board->columns()->orderBy('position')->get(), 200 );
+            return ApiResponse::success($column);
         }
 
         $maxPosition = $board->columns()->max('position');
 
         if ($targetPosition > $maxPosition) {
-            return response()->json([
-                'error' => [
-                    'code' => 422,
-                    'message' => 'Invalid target position',
-                ]
-            ], 422);
+            abort(422, 'Invalid target position');
         }
 
         DB::transaction(function () use ($board, $column, $targetPosition) {
@@ -108,14 +103,6 @@ class ColumnController extends Controller
      */
     public function destroy(Board $board, Column $column)
     {
-        if(!$column)
-            return response()->json([
-                'error' => [
-                    'code' => 404,
-                    'message' => 'Resource not found',
-                ]
-            ], 404);
-
         $this->authorize('delete', $column);
 
         DB::transaction(function () use ($column) {

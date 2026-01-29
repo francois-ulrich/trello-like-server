@@ -81,18 +81,13 @@ class CardController extends Controller
         $targetPosition = $data['targetPosition'];
 
         if ($targetPosition === $card->position) {
-            return response()->json( $column->cards()->orderBy('position')->get(), 200 );
+            return ApiResponse::success($card);
         }
 
         $maxPosition = $column->cards()->max('position');
 
         if ($targetPosition > $maxPosition) {
-            return response()->json([
-                'error' => [
-                    'code' => 422,
-                    'message' => 'Invalid target position',
-                ]
-            ], 422);
+            abort(422, 'Invalid target position');
         }
 
         DB::transaction(function () use ($column, $card, $targetPosition) {
@@ -111,14 +106,6 @@ class CardController extends Controller
      */
     public function destroy(Board $board, Column $column, Card $card)
     {
-        if(!$card)
-            return response()->json([
-                'error' => [
-                    'code' => 404,
-                    'message' => 'Resource not found',
-                ]
-            ], 404);
-
         $this->authorize('delete', $card);
 
         DB::transaction(function () use ($card) {
