@@ -44,5 +44,6 @@ Route::middleware(JwtMiddleware::class)->group(function () {
         // User
         Route::get('user', [UserController::class, 'show'])->scopeBindings();
         Route::patch('user', [UserController::class, 'update'])->scopeBindings();
+        Route::delete('user', [UserController::class, 'destroy'])->scopeBindings();
     });
 });
