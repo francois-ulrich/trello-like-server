@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-
+use App\Http\ApiResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
@@ -18,7 +18,7 @@ class UserProfileController extends Controller
     public function get(Request $request){
         $user = auth()->user();
         $profile = $user->profile;
-        return response()->json(compact('profile'));
+        return ApiResponse::success($profile);
     }
 
     public function update(Request $request){

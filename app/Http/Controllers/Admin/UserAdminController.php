@@ -7,7 +7,7 @@ use App\Models\User;
 use App\Http\Controllers\Controller;
 use App\Http\ApiResponse;
 
-class UserController extends Controller
+class UserAdminController extends Controller
 {
     /**
      * Returns a listing of the resource.
@@ -27,23 +27,19 @@ class UserController extends Controller
         return response()->json($user, 200);
     }
 
-    public function ban(string $user_id)
+    public function ban(User $user)
     {
-        $user = User::findOrFail($user_id);
-
         if($user->isAdmin())
-            return response()->json($user, 200);
+            return abort(403);
 
         $user->update([ 'banned_at' => now(), ]);
         return response()->json($user, 200);
     }
 
-    public function unban(string $user_id)
+    public function unban(User $user)
     {
-        $user = User::findOrFail($user_id);
-
         if($user->isAdmin())
-            return response()->json($user, 200);
+            return abort(403);
 
         $user->update([ 'banned_at' => null, ]);
         return response()->json($user, 200);

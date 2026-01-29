@@ -3,13 +3,13 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\BoardController;
-use App\Http\Controllers\UserProfileController;
+use App\Http\Controllers\UserController;
 use App\Http\Controllers\ColumnController;
 use App\Http\Controllers\CardController;
 use App\Http\Middleware\JwtMiddleware;
 use App\Http\Middleware\AdminMiddleware;
 use App\Http\Middleware\EnsureUserIsNotBanned;
-use App\Http\Controllers\Admin\UserController;
+use App\Http\Controllers\Admin\UserAdminController;
 
 Route::middleware(JwtMiddleware::class)->group(function () {
     // Authentication
@@ -25,9 +25,9 @@ Route::middleware(JwtMiddleware::class)->group(function () {
     Route::middleware([EnsureUserIsNotBanned::class])->group(function () {
         // Admin
         Route::middleware([AdminMiddleware::class])->prefix('admin')->group(function () {
-            Route::apiResource('users', UserController::class)->only(['index', 'show']); //TODO: add ->only([]) to other route declarations
-            Route::patch('users/{user_id}/ban', [UserController::class, 'ban'] );
-            Route::patch('users/{user_id}/unban', [UserController::class, 'unban'] );
+            Route::apiResource('users', UserAdminController::class)->only(['index', 'show']); //TODO: add ->only([]) to other route declarations
+            Route::patch('users/{user}/ban', [UserAdminController::class, 'ban'] )->scopeBindings();
+            Route::patch('users/{user}/unban', [UserAdminController::class, 'unban'] )->scopeBindings();
         });
 
         // Cards
@@ -41,8 +41,8 @@ Route::middleware(JwtMiddleware::class)->group(function () {
         // Boards
         Route::apiResource('boards', BoardController::class);
 
-        // User profile
-        Route::get('user/profile', [UserProfileController::class, 'get']);
-        Route::put('user/profile', [UserProfileController::class, 'update']);
+        // User
+        Route::get('user', [UserController::class, 'show'])->scopeBindings();
+        Route::patch('user', [UserController::class, 'update'])->scopeBindings();
     });
 });
