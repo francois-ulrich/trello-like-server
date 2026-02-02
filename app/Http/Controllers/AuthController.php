@@ -50,7 +50,7 @@ class AuthController extends Controller
             'Strict'          // Politique SameSite
         );
 
-        return response()->json(compact('user'), 201)->cookie($cookie);
+        return ApiResponse::created(compact('user'));
     }
 
     // User login
@@ -89,7 +89,6 @@ class AuthController extends Controller
     public function logout()
     {
         JWTAuth::invalidate(JWTAuth::getToken());
-
-        return response()->json(['message' => 'Successfully logged out']);
+        return ApiResponse::success(null, "Successfully logged out");
     }
 }
