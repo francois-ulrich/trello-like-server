@@ -19,13 +19,10 @@ Route::middleware(JwtMiddleware::class)->group(function () {
         Route::post('logout', [AuthController::class, 'logout']);
     });
 
-    // User
-    Route::get('user', [AuthController::class, 'getUser']);
-
     Route::middleware([EnsureUserIsNotBanned::class])->group(function () {
         // Admin
         Route::middleware([AdminMiddleware::class])->prefix('admin')->group(function () {
-            Route::apiResource('users', UserAdminController::class)->only(['index', 'show']); //TODO: add ->only([]) to other route declarations
+            Route::apiResource('users', UserAdminController::class)->only(['index', 'show']);
             Route::patch('users/{user}/ban', [UserAdminController::class, 'ban'] )->scopeBindings();
             Route::patch('users/{user}/unban', [UserAdminController::class, 'unban'] )->scopeBindings();
         });
@@ -42,8 +39,8 @@ Route::middleware(JwtMiddleware::class)->group(function () {
         Route::apiResource('boards', BoardController::class);
 
         // User
-        Route::get('user', [UserController::class, 'show'])->scopeBindings();
-        Route::patch('user', [UserController::class, 'update'])->scopeBindings();
-        Route::delete('user', [UserController::class, 'destroy'])->scopeBindings();
+        Route::get('me', [UserController::class, 'show'])->scopeBindings();
+        Route::patch('me', [UserController::class, 'update'])->scopeBindings();
+        Route::delete('me', [UserController::class, 'destroy'])->scopeBindings();
     });
 });

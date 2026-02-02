@@ -85,20 +85,6 @@ class AuthController extends Controller
         }
     }
 
-    // Get authenticated user
-    public function getUser()
-    {
-        try {
-            if (! $user = JWTAuth::parseToken()->authenticate()) {
-                return ApiResponse::error('User not found', 404);
-            }
-        } catch (JWTException $e) {
-            return ApiResponse::error('Invalid token', 400, $e);
-        }
-
-        return response()->json(compact('user'));
-    }
-
     // User logout
     public function logout()
     {
