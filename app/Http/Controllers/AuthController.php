@@ -79,7 +79,7 @@ class AuthController extends Controller
                 'None'          // Politique SameSite
             );
 
-            return ApiResponse::success(compact('user'))->cookie($cookie);
+            return ApiResponse::success(compact('user'), 'Successfully logged in !')->cookie($cookie);
         } catch (JWTException $e) {
             return ApiResponse::error('Could not create token', 500, $e);
         }

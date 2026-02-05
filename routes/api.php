@@ -17,6 +17,9 @@ Route::middleware(JwtMiddleware::class)->group(function () {
         Route::post('register', [AuthController::class, 'register'])->withoutMiddleware([JwtMiddleware::class]);
         Route::post('login', [AuthController::class, 'login'])->withoutMiddleware([JwtMiddleware::class]);
         Route::post('logout', [AuthController::class, 'logout']);
+        Route::get('me', [UserController::class, 'show'])->scopeBindings();
+        Route::patch('me', [UserController::class, 'update'])->scopeBindings();
+        Route::delete('me', [UserController::class, 'destroy'])->scopeBindings();
     });
 
     Route::middleware([EnsureUserIsNotBanned::class])->group(function () {
@@ -37,10 +40,5 @@ Route::middleware(JwtMiddleware::class)->group(function () {
 
         // Boards
         Route::apiResource('boards', BoardController::class);
-
-        // User
-        Route::get('me', [UserController::class, 'show'])->scopeBindings();
-        Route::patch('me', [UserController::class, 'update'])->scopeBindings();
-        Route::delete('me', [UserController::class, 'destroy'])->scopeBindings();
     });
 });
