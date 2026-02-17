@@ -9,7 +9,8 @@ use Tymon\JWTAuth\Facades\JWTAuth;
 class UserController extends Controller
 {
     public function show(Request $request) {
-        return ApiResponse::success($request->user(), "Logged in !");
+        $user = $request->user();
+        return ApiResponse::success(compact('user'), "Logged in !");
     }
 
     public function update(Request $request) {
