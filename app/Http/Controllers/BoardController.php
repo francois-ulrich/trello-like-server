@@ -13,7 +13,7 @@ class BoardController extends Controller
      */
     public function index()
     {
-        $boards = Board::where('user_id', auth()->user()->id)->get();
+        $boards = Board::where('user_id', auth()->user()->id)->with("columns.cards")->get();
         return ApiResponse::success($boards);
     }
 
