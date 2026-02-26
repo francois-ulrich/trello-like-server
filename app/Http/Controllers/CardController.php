@@ -70,32 +70,51 @@ class CardController extends Controller
         return ApiResponse::updated($card);
     }
 
-    public function move(Board $board, Column $column, Card $card, Request $request)
+    public function move(Card $card, Request $request)
     {
         $this->authorize('update', $card);
 
         $data = $request->validate([
             'targetPosition' => 'required|integer|min:0',
+            'targetColumnId' => 'required|integer|min:0',
         ]);
 
         $targetPosition = $data['targetPosition'];
+        $targetColumnId = $data['targetColumnId'];
 
-        if ($targetPosition === $card->position) {
+        if ($targetColumnId === $card->column_id && $targetPosition === $card->position) {
             return ApiResponse::success($card);
         }
 
-        $maxPosition = $column->cards()->max('position');
+        $targetColumn = $targetColumnId === $card->column_id ? $card->column : Column::find($targetColumnId);
+
+        $maxPosition = $targetColumn->cards()->max('position') + 1;
 
         if ($targetPosition > $maxPosition) {
             abort(422, 'Invalid target position');
         }
 
-        DB::transaction(function () use ($column, $card, $targetPosition) {
+        DB::transaction(function () use ($card, $targetColumn, $targetPosition) {
             $previousPosition = $card->position;
-            $cardToDisplace = $column->cards->where("position", $targetPosition)->firstOrFail();
 
-            $card->update(['position' => $targetPosition]);
-            $cardToDisplace->update(['position' => $previousPosition]);
+            if($targetColumn != $card->column){
+                Card::where('column_id', $targetColumn->id)
+                ->where('position', '>=', $targetPosition)
+                ->increment('position');
+
+                Card::where('column_id', $card->column_id)
+                ->where('position', '>', $card->position)
+                ->decrement('position');
+
+                $card->update([
+                    'column_id' => $targetColumn->id,
+                    'position' => $targetPosition
+                ]);
+            }else{
+                $cardToDisplace = $targetColumn->cards->where("position", $targetPosition)->firstOrFail();
+                $card->update(['position' => $targetPosition]);
+                $cardToDisplace->update(['position' => $previousPosition]);
+            }
         });
 
         return ApiResponse::updated($card);
