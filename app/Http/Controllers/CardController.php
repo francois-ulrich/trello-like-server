@@ -56,7 +56,7 @@ class CardController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Card $card, Request $request)
+    public function update(Board $board, Column $column, Card $card, Request $request)
     {
         $this->authorize('update', $card);
 
