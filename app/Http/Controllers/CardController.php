@@ -56,7 +56,7 @@ class CardController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Board $board, Column $column, Card $card, Request $request)
+    public function update(Card $card, Request $request)
     {
         $this->authorize('update', $card);
 
@@ -70,7 +70,7 @@ class CardController extends Controller
         return ApiResponse::updated($card);
     }
 
-    public function move(Card $card, Request $request)
+    public function move(Board $board, Column $column, Card $card, Request $request)
     {
         $this->authorize('update', $card);
 
