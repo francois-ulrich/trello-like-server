@@ -8,6 +8,7 @@ use App\Models\Column;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Http\ApiResponse;
+use Illuminate\Database\Eloquent\Builder;
 
 class CardController extends Controller
 {
@@ -83,7 +84,10 @@ class CardController extends Controller
         $targetColumnId = $data['targetColumnId'];
 
         if ($targetColumnId === $card->column_id && $targetPosition === $card->position) {
-            return ApiResponse::success($card);
+            return ApiResponse::success([
+                "movedCard" => $card,
+                "affectedCards" => []
+            ]);
         }
 
         $targetColumn = $targetColumnId === $card->column_id ? $card->column : Column::find($targetColumnId);
@@ -95,29 +99,39 @@ class CardController extends Controller
         }
 
         DB::transaction(function () use ($card, $targetColumn, $targetPosition) {
-            $previousPosition = $card->position;
-
             if($targetColumn != $card->column){
-                Card::where('column_id', $targetColumn->id)
-                ->where('position', '>=', $targetPosition)
-                ->increment('position');
-
                 Card::where('column_id', $card->column_id)
                 ->where('position', '>', $card->position)
                 ->decrement('position');
+
+                Card::where('column_id', $targetColumn->id)
+                ->where('position', '>=', $targetPosition)
+                ->increment('position');
 
                 $card->update([
                     'column_id' => $targetColumn->id,
                     'position' => $targetPosition
                 ]);
             }else{
-                $cardToDisplace = $targetColumn->cards->where("position", $targetPosition)->firstOrFail();
+                if ($targetPosition > $card->position) {
+                    Card::where('column_id', $card->column_id)
+                        ->whereBetween('position', [$card->position + 1, $targetPosition])
+                        ->decrement('position');
+                } elseif ($targetPosition < $card->position) {
+                    Card::where('column_id', $card->column_id)
+                        ->whereBetween('position', [$targetPosition, $card->position - 1])
+                        ->increment('position');
+                }
+
                 $card->update(['position' => $targetPosition]);
-                $cardToDisplace->update(['position' => $previousPosition]);
             }
         });
 
-        return ApiResponse::updated($card);
+        $data = [
+            "movedCard" => $card
+        ];
+
+        return ApiResponse::updated($data);
     }
 
     /**

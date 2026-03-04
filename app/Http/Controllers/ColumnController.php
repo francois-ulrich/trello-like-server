@@ -7,6 +7,7 @@ use App\Models\Column;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Http\ApiResponse;
+use Illuminate\Database\Eloquent\Builder;
 
 class ColumnController extends Controller
 {
@@ -88,11 +89,12 @@ class ColumnController extends Controller
         }
 
         DB::transaction(function () use ($board, $column, $targetPosition) {
-            $previousPosition = $column->position;
-            $columnToDisplace = $board->columns->where("position", $targetPosition)->firstOrFail();
+            Column::where('board_id', $board->id)
+            ->where('id', '!=', $column->id)
+            ->where('position', '>=', $targetPosition)
+            ->increment('position');
 
             $column->update(['position' => $targetPosition]);
-            $columnToDisplace->update(['position' => $previousPosition]);
         });
 
         return ApiResponse::updated($column);
