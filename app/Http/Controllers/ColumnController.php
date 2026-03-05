@@ -88,16 +88,23 @@ class ColumnController extends Controller
             abort(422, 'Invalid target position');
         }
 
-        DB::transaction(function () use ($board, $column, $targetPosition) {
-            Column::where('board_id', $board->id)
-            ->where('id', '!=', $column->id)
-            ->where('position', '>=', $targetPosition)
-            ->increment('position');
+        DB::transaction(function () use ($column, $targetPosition) {
+            if ($targetPosition > $column->position) {
+                Column::where('board_id', $column->board_id)
+                    ->whereBetween('position', [$column->position + 1, $targetPosition])
+                    ->decrement('position');
+            } elseif ($targetPosition < $column->position) {
+                Column::where('board_id', $column->board_id)
+                    ->whereBetween('position', [$targetPosition, $column->position - 1])
+                    ->increment('position');
+            }
 
             $column->update(['position' => $targetPosition]);
         });
 
-        return ApiResponse::updated($column);
+        $data = ["movedColumn" => $column];
+
+        return ApiResponse::updated($data);
     }
 
     /**
