@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\ApiResponse;
+use App\Http\Resources\UserResource;
 use Illuminate\Http\Request;
 use Tymon\JWTAuth\Facades\JWTAuth;
 
@@ -10,7 +11,8 @@ class UserController extends Controller
 {
     public function show(Request $request) {
         $user = $request->user();
-        return ApiResponse::success(compact('user'), "Logged in !");
+        $data = ["user" => new UserResource($user)];
+        return ApiResponse::success($data, "Logged in !");
     }
 
     public function update(Request $request) {
