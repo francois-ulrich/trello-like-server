@@ -6,6 +6,7 @@ use App\Models\User;
 use App\Models\Role;
 use App\Models\UserProfile;
 use App\Http\ApiResponse;
+use App\Http\Resources\UserResource;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
@@ -39,7 +40,7 @@ class AuthController extends Controller
         $token = JWTAuth::fromUser($user);
 
         $cookie = cookie(
-            'accessToken',      // Nom du cookie
+            'token',      // Nom du cookie
             $token,           // Valeur du cookie (le token JWT)
             60,               // Durée en minutes
             '/',              // Chemin
@@ -47,10 +48,12 @@ class AuthController extends Controller
             true,             // Secure (HTTPS uniquement)
             true,             // HTTP-only
             false,            // SameSite=None
-            'Strict'          // Politique SameSite
+            'None'          // Politique SameSite
         );
 
-        return ApiResponse::created(compact('user'));
+        $data = ["user" => new UserResource($user)];
+
+        return ApiResponse::created($data)->cookie($cookie);
     }
 
     // User login
@@ -79,7 +82,9 @@ class AuthController extends Controller
                 'None'          // Politique SameSite
             );
 
-            return ApiResponse::success(compact('user'), 'Successfully logged in !')->cookie($cookie);
+            $data = ["user" => new UserResource($user)];
+
+            return ApiResponse::success($data, 'Successfully logged in !')->cookie($cookie);
         } catch (JWTException $e) {
             return ApiResponse::error('Could not create token', 500, $e);
         }
