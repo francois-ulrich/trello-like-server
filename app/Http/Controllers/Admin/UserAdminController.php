@@ -47,6 +47,6 @@ class UserAdminController extends Controller
 
     public function getUserBoards(User $user)
     {
-        return ApiResponse::success($user->with("boards")->get());
+        return ApiResponse::success($user->boards);
     }
 }
