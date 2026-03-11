@@ -23,7 +23,7 @@ class UserAdminController extends Controller
      */
     public function show(User $user)
     {
-        $user->load('profile', 'role');
+        $user->load('profile', 'role', 'boards.columns.cards');
         return response()->json($user, 200);
     }
 
@@ -43,5 +43,10 @@ class UserAdminController extends Controller
 
         $user->update([ 'banned_at' => null, ]);
         return response()->json($user, 200);
+    }
+
+    public function getUserBoards(User $user)
+    {
+        return ApiResponse::success($user->with("boards")->get());
     }
 }

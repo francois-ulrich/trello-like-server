@@ -26,6 +26,7 @@ Route::middleware(JwtMiddleware::class)->group(function () {
         // Admin
         Route::middleware([AdminMiddleware::class])->prefix('admin')->group(function () {
             Route::apiResource('users', UserAdminController::class)->only(['index', 'show']);
+            Route::get('users/{user}/boards', [UserAdminController::class, 'getUserBoards'] )->scopeBindings();
             Route::patch('users/{user}/ban', [UserAdminController::class, 'ban'] )->scopeBindings();
             Route::patch('users/{user}/unban', [UserAdminController::class, 'unban'] )->scopeBindings();
         });
