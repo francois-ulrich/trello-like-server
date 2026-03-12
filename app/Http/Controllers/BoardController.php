@@ -23,7 +23,7 @@ class BoardController extends Controller
     public function show(Board $board)
     {
         $this->authorize("view", $board);
-        return ApiResponse::success($board->with("columns.cards")->get());
+        return ApiResponse::success($board->load("columns.cards"));
     }
 
     /**
