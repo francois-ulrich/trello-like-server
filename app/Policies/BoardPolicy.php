@@ -12,7 +12,7 @@ class BoardPolicy
      */
     public function view(User $user, Board $board): bool
     {
-        return $board->user_id === $user->id;
+        return $user->isAdmin() || $board->user_id === $user->id;
     }
 
     /**
