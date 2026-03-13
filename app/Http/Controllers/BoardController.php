@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Board;
 use App\Http\ApiResponse;
+use App\Http\Resources\BoardResource;
 use Illuminate\Http\Request;
 
 class BoardController extends Controller
@@ -14,7 +15,7 @@ class BoardController extends Controller
     public function index()
     {
         $boards = Board::where('user_id', auth()->user()->id)->with("columns.cards")->get();
-        return ApiResponse::success($boards);
+        return ApiResponse::success(BoardResource::collection($boards));
     }
 
     /**
@@ -23,7 +24,7 @@ class BoardController extends Controller
     public function show(Board $board)
     {
         $this->authorize("view", $board);
-        return ApiResponse::success($board->load("columns.cards"));
+        return ApiResponse::success(new BoardResource($board));
     }
 
     /**
