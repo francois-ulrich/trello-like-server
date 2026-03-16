@@ -41,7 +41,7 @@ class BoardController extends Controller
             'user_id' => $request->user()->id,
         ]);
 
-        return ApiResponse::created($board);
+        return ApiResponse::created(new BoardResource($board));
     }
 
     /**
@@ -59,7 +59,7 @@ class BoardController extends Controller
 
         $board->save();
 
-        return ApiResponse::updated($board);
+        return ApiResponse::updated(new BoardResource($board));
     }
 
     /**
@@ -69,6 +69,6 @@ class BoardController extends Controller
     {
         $this->authorize('delete', $board);
         $board->delete();
-        return ApiResponse::deleted($board);
+        return ApiResponse::deleted(new BoardResource($board));
     }
 }
