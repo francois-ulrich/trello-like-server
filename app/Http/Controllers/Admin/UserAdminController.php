@@ -33,7 +33,8 @@ class UserAdminController extends Controller
             return abort(403);
 
         $user->update([ 'banned_at' => now(), ]);
-        return response()->json($user, 200);
+
+        return ApiResponse::success($user);
     }
 
     public function unban(User $user)
@@ -42,7 +43,8 @@ class UserAdminController extends Controller
             return abort(403);
 
         $user->update([ 'banned_at' => null, ]);
-        return response()->json($user, 200);
+
+        return ApiResponse::success($user);
     }
 
     public function getUserBoards(User $user)
