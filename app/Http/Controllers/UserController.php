@@ -12,6 +12,10 @@ class UserController extends Controller
     public function show(Request $request) {
         $user = $request->user();
         $data = ["user" => new UserResource($user)];
+
+        if($user->banned_at != null)
+            return ApiResponse::success($data, 'User is banned');
+
         return ApiResponse::success($data, "Logged in !");
     }
 

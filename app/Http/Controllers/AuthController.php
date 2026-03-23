@@ -84,6 +84,9 @@ class AuthController extends Controller
 
             $data = ["user" => new UserResource($user)];
 
+            if($user->banned_at !== null)
+                return ApiResponse::success($data, 'User is banned');
+
             return ApiResponse::success($data, 'Successfully logged in !')->cookie($cookie);
         } catch (JWTException $e) {
             return ApiResponse::error('Could not create token', 500, $e);
