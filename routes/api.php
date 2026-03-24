@@ -10,6 +10,9 @@ use App\Http\Middleware\JwtMiddleware;
 use App\Http\Middleware\AdminMiddleware;
 use App\Http\Middleware\EnsureUserIsNotBanned;
 use App\Http\Controllers\Admin\UserAdminController;
+use Illuminate\Auth\Middleware\EnsureEmailIsVerified;
+use Illuminate\Foundation\Auth\EmailVerificationRequest;
+use Illuminate\Http\Request;
 
 Route::middleware(JwtMiddleware::class)->group(function () {
     // Authentication
@@ -22,7 +25,7 @@ Route::middleware(JwtMiddleware::class)->group(function () {
         Route::delete('me', [UserController::class, 'destroy'])->scopeBindings();
     });
 
-    Route::middleware([EnsureUserIsNotBanned::class])->group(function () {
+    Route::middleware([EnsureEmailIsVerified::class, EnsureUserIsNotBanned::class])->group(function () {
         // Admin
         Route::middleware([AdminMiddleware::class])->prefix('admin')->group(function () {
             Route::apiResource('users', UserAdminController::class)->only(['index', 'show']);
@@ -42,4 +45,23 @@ Route::middleware(JwtMiddleware::class)->group(function () {
         // Boards
         Route::apiResource('boards', BoardController::class);
     });
+
+    Route::prefix('email')->group(function () {
+        Route::get('/verify', function () {
+            return view('auth.verify-email');
+        })->name('verification.notice');
+
+        Route::get('/verify/{id}/{hash}', function (EmailVerificationRequest $request) {
+            $request->fulfill();
+
+            return redirect(config('app.frontend_url') . '/email-verified');
+        })->middleware(['signed'])->name('verification.verify');
+
+        Route::post('/verification-notification', function (Request $request) {
+            $request->user()->sendEmailVerificationNotification();
+            return back()->with('message', 'Verification link sent!');
+        })->middleware(['throttle:6,1'])->name('verification.send');
+    });
 });
+
+

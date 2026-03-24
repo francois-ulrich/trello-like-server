@@ -7,6 +7,7 @@ use App\Models\Role;
 use App\Models\UserProfile;
 use App\Http\ApiResponse;
 use App\Http\Resources\UserResource;
+use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
@@ -36,6 +37,8 @@ class AuthController extends Controller
         ]);
 
         $user->profile()->save(new UserProfile());
+
+        event(new Registered($user));
 
         $token = JWTAuth::fromUser($user);
 
