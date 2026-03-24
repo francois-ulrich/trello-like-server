@@ -19,6 +19,7 @@ class UserResource extends JsonResource
             'email' => $this->email,
             'role' => $this->role->slug,
             'isBanned' => $this->banned_at != null,
+            'emailIsVerified' => $this->hasVerifiedEmail(),
         ];
     }
 }
