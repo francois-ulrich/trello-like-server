@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\ApiResponse;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\BoardController;
@@ -23,6 +24,10 @@ Route::middleware(JwtMiddleware::class)->group(function () {
         Route::get('me', [UserController::class, 'show'])->scopeBindings();
         Route::patch('me', [UserController::class, 'update'])->scopeBindings();
         Route::delete('me', [UserController::class, 'destroy'])->scopeBindings();
+        Route::post('verification-notification', function (Request $request) {
+            $request->user()->sendEmailVerificationNotification();
+            return ApiResponse::success(null, "Email has been sent !");
+        })->middleware(['throttle:6,1'])->name('verification.send');
     });
 
     Route::middleware([EnsureEmailIsVerified::class, EnsureUserIsNotBanned::class])->group(function () {
@@ -56,11 +61,6 @@ Route::middleware(JwtMiddleware::class)->group(function () {
 
             return redirect(config('app.frontend_url') . '/email-verified');
         })->middleware(['signed'])->name('verification.verify');
-
-        Route::post('/verification-notification', function (Request $request) {
-            $request->user()->sendEmailVerificationNotification();
-            return back()->with('message', 'Verification link sent!');
-        })->middleware(['throttle:6,1'])->name('verification.send');
     });
 });
 
