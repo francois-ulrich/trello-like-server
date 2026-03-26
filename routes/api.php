@@ -20,7 +20,7 @@ Route::middleware(JwtMiddleware::class)->group(function () {
     Route::prefix('auth')->group(function () {
         Route::post('register', [AuthController::class, 'register'])->withoutMiddleware([JwtMiddleware::class]);
         Route::post('login', [AuthController::class, 'login'])->withoutMiddleware([JwtMiddleware::class]);
-        Route::post('logout', [AuthController::class, 'logout']);
+        Route::post('logout', [AuthController::class, 'logout'])->withoutMiddleware([JwtMiddleware::class]);
         Route::get('me', [UserController::class, 'show'])->scopeBindings();
         Route::patch('me', [UserController::class, 'update'])->scopeBindings();
         Route::delete('me', [UserController::class, 'destroy'])->scopeBindings();
