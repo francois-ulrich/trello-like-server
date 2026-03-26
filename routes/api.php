@@ -27,7 +27,7 @@ Route::middleware(JwtMiddleware::class)->group(function () {
         Route::post('verification-notification', function (Request $request) {
             $request->user()->sendEmailVerificationNotification();
             return ApiResponse::success(null, "Email has been sent !");
-        })->middleware(['throttle:6,1'])->name('verification.send');
+        })->middleware(['throttle:2,1'])->name('verification.send');
     });
 
     Route::middleware([EnsureEmailIsVerified::class, EnsureUserIsNotBanned::class])->group(function () {
