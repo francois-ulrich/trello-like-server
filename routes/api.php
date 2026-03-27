@@ -22,28 +22,14 @@ Route::middleware(JwtMiddleware::class)->group(function () {
         Route::post('register', [AuthController::class, 'register'])->withoutMiddleware([JwtMiddleware::class]);
         Route::post('login', [AuthController::class, 'login'])->withoutMiddleware([JwtMiddleware::class]);
         Route::post('logout', [AuthController::class, 'logout'])->withoutMiddleware([JwtMiddleware::class]);
-        Route::post('forgot-password', function (Request $request) {
-            $request->validate(['email' => 'required|email']);
-
-            $status = Password::sendResetLink(
-                $request->only('email')
-            );
-
-            return $status === Password::ResetLinkSent
-                ? ApiResponse::success(['status' => __($status)], "Email has been sent !")
-                : ApiResponse::error("An error occured.");
-
-            return ApiResponse::success(null, "Email has been sent !");
-        })->withoutMiddleware([JwtMiddleware::class]);
+        Route::post('forgot-password', [AuthController::class, 'sendPasswordResetEmail'])->withoutMiddleware([JwtMiddleware::class]);
+        Route::post('verification-notification', [AuthController::class, 'sendVerificationEmail'])->middleware(['throttle:2,1'])->name('verification.send');
+        Route::post('forgot-password', [AuthController::class, 'sendPasswordResetEmail'])->withoutMiddleware([JwtMiddleware::class]);
+        Route::post('reset-password', [AuthController::class, 'resetPassword'])->withoutMiddleware([JwtMiddleware::class]);
 
         Route::get('me', [UserController::class, 'show'])->scopeBindings();
         Route::patch('me', [UserController::class, 'update'])->scopeBindings();
         Route::delete('me', [UserController::class, 'destroy'])->scopeBindings();
-
-        Route::post('verification-notification', function (Request $request) {
-            $request->user()->sendEmailVerificationNotification();
-            return ApiResponse::success(null, "Email has been sent !");
-        })->middleware(['throttle:2,1'])->name('verification.send');
     });
 
     Route::middleware([EnsureEmailIsVerified::class, EnsureUserIsNotBanned::class])->group(function () {
